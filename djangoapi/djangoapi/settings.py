@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+import dj_database_url 
+import os
+import django_heroku
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-#emx725cv8034kg_xk2f!%k^#l2yc-dlg1fc*4u@2%(^uy82f('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -39,12 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'rest_framework_simplejwt',
-    'corsheaders'
+    'corsheaders',
+    'whitenoise.runserver_nostatic'
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,17 +84,8 @@ WSGI_APPLICATION = 'djangoapi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'amstdb',
-        'USER': 'postgres', 
-        'PASSWORD': 'postgres', 
-        'HOST': 'localhost',
-        'PORT': '5432',
-
-    }
-}
+DATABASES = {}
+DATABASES ['default'] = dj_database_url.config(conn_max_age=600)
 
 
 # Password validation
@@ -124,7 +122,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -144,3 +141,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication']
 }
 
+ALLOWED_HOSTS = [ 'apisensores-edf93a047431.herokuapp.com']
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStat icFilesStorage'
+django_heroku.settings(locals())
